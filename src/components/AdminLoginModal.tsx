@@ -20,7 +20,7 @@ export default function AdminLoginModal({ onSuccess, onClose }: AdminLoginModalP
     // Simulate network delay for a more realistic & premium feel
     setTimeout(() => {
       // Allow 'admin' or 'admin123' as default passwords
-      if (password === 'admin' || password === 'admin123') {
+      if (password === 'Liin@123') {
         onSuccess();
       } else {
         setError('Mật khẩu không chính xác. Vui lòng thử lại!');
@@ -32,7 +32,7 @@ export default function AdminLoginModal({ onSuccess, onClose }: AdminLoginModalP
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div 
+      <div
         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300"
         onClick={onClose}
       />
@@ -80,11 +80,10 @@ export default function AdminLoginModal({ onSuccess, onClose }: AdminLoginModalP
                   if (error) setError('');
                 }}
                 placeholder="Nhập mật khẩu quản trị viên"
-                className={`block w-full rounded-xl border py-2.5 pl-10 pr-10 text-sm shadow-sm transition-all focus:outline-none focus:ring-2 ${
-                  error
+                className={`block w-full rounded-xl border py-2.5 pl-10 pr-10 text-sm shadow-sm transition-all focus:outline-none focus:ring-2 ${error
                     ? 'border-rose-300 bg-rose-50/50 text-rose-900 placeholder-rose-300 focus:border-rose-500 focus:ring-rose-200'
                     : 'border-slate-200 bg-slate-50/50 text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:ring-indigo-100'
-                }`}
+                  }`}
                 disabled={isSubmitting}
                 autoFocus
               />
@@ -101,7 +100,7 @@ export default function AdminLoginModal({ onSuccess, onClose }: AdminLoginModalP
                 )}
               </button>
             </div>
-            
+
             {/* Error Message */}
             {error && (
               <div className="mt-2 flex items-start gap-1.5 text-xs font-semibold text-rose-600 animate-shake">
@@ -109,7 +108,7 @@ export default function AdminLoginModal({ onSuccess, onClose }: AdminLoginModalP
                 <span>{error}</span>
               </div>
             )}
-            
+
             {/* Default Password Info Hint */}
             <p className="mt-2.5 text-[11px] text-slate-400 italic">
               * Gợi ý: Mật khẩu mặc định là <span className="font-bold text-slate-500 select-all">admin123</span> hoặc <span className="font-bold text-slate-500 select-all">admin</span>.
