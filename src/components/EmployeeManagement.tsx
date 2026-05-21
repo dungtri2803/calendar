@@ -1,0 +1,381 @@
+import { useState } from 'react';
+import { 
+  UserPlus, 
+  Users,
+  Edit, 
+  Trash2, 
+  DollarSign, 
+  Calendar, 
+  Search, 
+  Check, 
+  X, 
+  AlertCircle 
+} from 'lucide-react';
+import { Employee, ShiftAssignment, ShiftType } from '../types';
+import { 
+  calculateHours, 
+  calculateSalary, 
+  formatVND, 
+  filterAssignmentsByMonth 
+} from '../utils/calculations';
+
+interface EmployeeManagementProps {
+  employees: Employee[];
+  shiftTypes: ShiftType[];
+  assignments: ShiftAssignment[];
+  onAddEmployee: (emp: Omit<Employee, 'id'>) => Promise<void>;
+  onUpdateEmployee: (emp: Employee) => Promise<void>;
+  onDeleteEmployee: (id: string) => Promise<void>;
+}
+
+export default function EmployeeManagement({
+  employees,
+  shiftTypes,
+  assignments,
+  onAddEmployee,
+  onUpdateEmployee,
+  onDeleteEmployee,
+}: EmployeeManagementProps) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isEditing, setIsEditing] = useState<string | null>(null); // employee.id or 'new'
+  
+  // Form values
+  const [name, setName] = useState('');
+  const [dob, setDob] = useState('');
+  const [hourlyRate, setHourlyRate] = useState(30000);
+  const [formError, setFormError] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Delete confirmation
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+
+  // Month selection for quick hours & salary metrics
+  const [selectedMonth, setSelectedMonth] = useState(() => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    return `${year}-${month}`;
+  });
+
+  const monthAssignments = filterAssignmentsByMonth(assignments, selectedMonth);
+
+  // Handle search
+  const filteredEmployees = employees.filter((emp) =>
+    emp.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Open form to create new
+  const handleNewClick = () => {
+    setName('');
+    setDob('');
+    setHourlyRate(30000);
+    setFormError('');
+    setIsEditing('new');
+  };
+
+  // Open form to edit
+  const handleEditClick = (emp: Employee) => {
+    setName(emp.name);
+    setDob(emp.dob);
+    setHourlyRate(emp.hourly_rate);
+    setFormError('');
+    setIsEditing(emp.id);
+  };
+
+  // Submit form
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError('');
+
+    if (!name.trim()) {
+      setFormError('Vui lòng nhập họ và tên nhân viên.');
+      return;
+    }
+    if (!dob) {
+      setFormError('Vui lòng chọn ngày sinh.');
+      return;
+    }
+    if (hourlyRate <= 0) {
+      setFormError('Mức lương theo giờ phải lớn hơn 0 VNĐ.');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      if (isEditing === 'new') {
+        await onAddEmployee({
+          name: name.trim(),
+          dob,
+          hourly_rate: hourlyRate,
+        });
+      } else if (isEditing) {
+        await onUpdateEmployee({
+          id: isEditing,
+          name: name.trim(),
+          dob,
+          hourly_rate: hourlyRate,
+        });
+      }
+      setIsEditing(null);
+    } catch (error) {
+      setFormError('Có lỗi xảy ra khi lưu dữ liệu.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Delete handler
+  const handleDelete = async (id: string) => {
+    try {
+      await onDeleteEmployee(id);
+      setConfirmDeleteId(null);
+    } catch (error) {
+      alert('Lỗi khi xóa nhân viên.');
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Section Title & Actions */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">Hồ Sơ Nhân Viên</h2>
+          <p className="text-slate-500">Quản lý thông tin cơ bản, thiết lập mức lương theo giờ và theo dõi tổng giờ làm việc.</p>
+        </div>
+        <button
+          onClick={handleNewClick}
+          className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+        >
+          <UserPlus className="h-4 w-4" />
+          Thêm nhân viên mới
+        </button>
+      </div>
+
+      {/* Filters & Tools */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute top-2.5 left-3 h-4 w-4 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Tìm kiếm nhân viên theo tên..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full rounded-xl border border-slate-200 pl-9 pr-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-slate-50/50"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Thống kê tháng:</span>
+          <input
+            type="month"
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
+            className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-sm focus:border-indigo-500 focus:outline-none"
+          />
+        </div>
+      </div>
+
+      {/* Form Modal / Sheet (Overlay when active) */}
+      {isEditing && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl animate-scale-in">
+            <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 bg-slate-50">
+              <h3 className="font-bold text-slate-900">
+                {isEditing === 'new' ? 'Thêm Nhân Viên Mới' : 'Chỉnh Sửa Thông Tin Nhân Viên'}
+              </h3>
+              <button
+                onClick={() => setIsEditing(null)}
+                className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              {formError && (
+                <div className="flex items-center gap-2 rounded-xl bg-rose-50 border border-rose-200 p-3 text-sm text-rose-700">
+                  <AlertCircle className="h-4 w-4 shrink-0" />
+                  <span>{formError}</span>
+                </div>
+              )}
+
+              {/* Name */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">Họ và tên</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Ví dụ: Nguyễn Văn A"
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                />
+              </div>
+
+              {/* DOB */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">Ngày tháng năm sinh</label>
+                <div className="relative">
+                  <Calendar className="absolute top-2.5 left-3 h-4 w-4 text-slate-400 pointer-events-none" />
+                  <input
+                    type="date"
+                    value={dob}
+                    onChange={(e) => setDob(e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 pl-9 pr-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+              </div>
+
+              {/* Hourly Rate */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">Mức lương theo giờ (VNĐ/giờ)</label>
+                <div className="relative">
+                  <DollarSign className="absolute top-2.5 left-3 h-4 w-4 text-slate-400 pointer-events-none" />
+                  <input
+                    type="number"
+                    value={hourlyRate}
+                    onChange={(e) => setHourlyRate(Number(e.target.value))}
+                    step="1000"
+                    min="0"
+                    className="w-full rounded-xl border border-slate-200 pl-9 pr-16 py-2 text-sm font-bold text-slate-800 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                  <span className="absolute top-2.5 right-3 text-xs font-bold text-slate-400 uppercase">VNĐ/H</span>
+                </div>
+              </div>
+
+              {/* Footer buttons */}
+              <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(null)}
+                  className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+                >
+                  {isSaving ? 'Đang lưu...' : 'Lưu thay đổi'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Employee Table & Grid */}
+      {filteredEmployees.length === 0 ? (
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white py-12 text-center">
+          <Users className="h-12 w-12 text-slate-300" />
+          <h4 className="mt-4 text-lg font-bold text-slate-900">Không tìm thấy nhân viên nào</h4>
+          <p className="mt-1 text-sm text-slate-500">Thử thay đổi từ khóa tìm kiếm hoặc thêm nhân viên mới.</p>
+          <button 
+            onClick={handleNewClick}
+            className="mt-4 text-sm font-semibold text-indigo-600 hover:underline"
+          >
+            Thêm ngay
+          </button>
+        </div>
+      ) : (
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-left">
+              <thead>
+                <tr className="border-b border-slate-200 bg-slate-50 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  <th className="px-6 py-4">Nhân viên</th>
+                  <th className="px-6 py-4">Ngày sinh</th>
+                  <th className="px-6 py-4">Mức lương / giờ</th>
+                  <th className="px-6 py-4 text-center">Giờ làm ({selectedMonth})</th>
+                  <th className="px-6 py-4 text-right">Thành tiền ({selectedMonth})</th>
+                  <th className="px-6 py-4 text-center">Hành động</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 text-sm">
+                {filteredEmployees.map((emp) => {
+                  const hours = calculateHours(emp.id, monthAssignments, shiftTypes);
+                  const salary = calculateSalary(emp.id, monthAssignments, shiftTypes, emp.hourly_rate);
+                  const isConfirmingDelete = confirmDeleteId === emp.id;
+
+                  // Age calculation
+                  const birthDate = new Date(emp.dob);
+                  const age = new Date().getFullYear() - birthDate.getFullYear();
+
+                  return (
+                    <tr key={emp.id} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="px-6 py-4.5">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 font-bold border border-indigo-100">
+                            {emp.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <div className="font-bold text-slate-900">{emp.name}</div>
+                            <div className="text-xs text-slate-500">Mã số: {emp.id.substring(0, 8)}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4.5 text-slate-600">
+                        <div>{emp.dob.split('-').reverse().join('/')}</div>
+                        <div className="text-xs text-slate-400">({age} tuổi)</div>
+                      </td>
+                      <td className="px-6 py-4.5 font-semibold text-slate-800">
+                        {formatVND(emp.hourly_rate)} <span className="text-xs font-normal text-slate-400">/h</span>
+                      </td>
+                      <td className="px-6 py-4.5 text-center">
+                        <span className="inline-flex items-center rounded-full bg-indigo-50 border border-indigo-100 px-2.5 py-1 text-xs font-bold text-indigo-700">
+                          {hours} giờ
+                        </span>
+                      </td>
+                      <td className="px-6 py-4.5 text-right font-bold text-indigo-600">
+                        {formatVND(salary)}
+                      </td>
+                      <td className="px-6 py-4.5">
+                        <div className="flex items-center justify-center gap-2">
+                          {isConfirmingDelete ? (
+                            <div className="flex items-center gap-1.5 bg-rose-50 border border-rose-200 rounded-lg p-1 animate-shake">
+                              <span className="text-xs font-semibold text-rose-700 px-1.5">Xóa vĩnh viễn?</span>
+                              <button
+                                onClick={() => handleDelete(emp.id)}
+                                className="rounded bg-rose-600 p-1 text-white hover:bg-rose-500"
+                                title="Xác nhận xóa"
+                              >
+                                <Check className="h-3 w-3" />
+                              </button>
+                              <button
+                                onClick={() => setConfirmDeleteId(null)}
+                                className="rounded bg-slate-200 p-1 text-slate-700 hover:bg-slate-300"
+                                title="Hủy bỏ"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => handleEditClick(emp)}
+                                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-indigo-600 transition-colors"
+                                title="Chỉnh sửa thông tin"
+                              >
+                                <Edit className="h-4.5 w-4.5" />
+                              </button>
+                              <button
+                                onClick={() => setConfirmDeleteId(emp.id)}
+                                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-rose-600 transition-colors"
+                                title="Xóa nhân viên"
+                              >
+                                <Trash2 className="h-4.5 w-4.5" />
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
