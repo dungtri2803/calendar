@@ -322,7 +322,7 @@ export default function App() {
       />
 
       {/* Main Content container */}
-      <main className="mx-auto max-w-8xl px-4 py-8 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-[1440px] px-3 py-5 sm:px-5 sm:py-7 lg:px-8">
 
         {role === 'admin' ? (
           /* ADMIN DASHBOARD TABS */
@@ -352,6 +352,7 @@ export default function App() {
                 employees={employees}
                 shiftTypes={shiftTypes}
                 assignments={assignments}
+                salaryAdvances={salaryAdvances}
                 onAddAssignment={handleAddAssignment}
                 onDeleteAssignment={handleDeleteAssignment}
                 onApplyWeekToMonth={handleApplyWeekToMonth}
@@ -403,17 +404,17 @@ export default function App() {
       </main>
 
       {/* Bottom right toast notifications */}
-      <div className="fixed bottom-5 right-5 z-50 space-y-2 max-w-sm w-full pointer-events-none">
+      <div className="pointer-events-none fixed inset-x-3 bottom-3 z-50 space-y-2 sm:inset-x-auto sm:right-5 sm:bottom-5 sm:w-full sm:max-w-sm">
         {notifications.map((note) => (
           <div
             key={note.id}
             className={`pointer-events-auto flex items-start gap-3 rounded-xl border p-4 shadow-lg transition-all duration-300 animate-slide-up ${note.type === 'success'
-                ? 'bg-white border-emerald-200 text-emerald-800 shadow-emerald-100/50'
-                : note.type === 'error'
-                  ? 'bg-white border-rose-200 text-rose-800 shadow-rose-100/50'
-                  : note.type === 'warning'
-                    ? 'bg-white border-amber-200 text-amber-800 shadow-amber-100/50'
-                    : 'bg-white border-indigo-200 text-indigo-800 shadow-indigo-100/50'
+              ? 'bg-white border-emerald-200 text-emerald-800 shadow-emerald-100/50'
+              : note.type === 'error'
+                ? 'bg-white border-rose-200 text-rose-800 shadow-rose-100/50'
+                : note.type === 'warning'
+                  ? 'bg-white border-amber-200 text-amber-800 shadow-amber-100/50'
+                  : 'bg-white border-indigo-200 text-indigo-800 shadow-indigo-100/50'
               }`}
           >
             {note.type === 'success' && <CheckCircle className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />}
@@ -444,7 +445,7 @@ export default function App() {
       )}
 
       {/* Footer */}
-      <footer className="mt-12 border-t border-slate-200 bg-white py-8 print:hidden">
+      {/* <footer className="mt-12 border-t border-slate-200 bg-white py-8 print:hidden">
         <div className="mx-auto max-w-8xl px-4 text-center sm:px-6 lg:px-8 space-y-3">
           <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
             StaffFlow — Hệ thống sắp xếp ca & Tự động tính lương nhân sự
@@ -453,7 +454,7 @@ export default function App() {
             © 2026 StaffFlow Inc. Hỗ trợ kéo thả trực quan và tích hợp Supabase Cloud.
           </p>
         </div>
-      </footer>
+      </footer> */}
     </div>
   );
 }

@@ -1,21 +1,22 @@
 import { useState } from 'react';
-import { 
-  Users, 
-  Clock, 
-  DollarSign, 
-  CalendarDays, 
-  ArrowUpRight, 
+import {
+  Users,
+  Clock,
+  DollarSign,
+  CalendarDays,
+  ArrowUpRight,
   UserCheck,
   Briefcase,
   TrendingUp
 } from 'lucide-react';
 import { Employee, ShiftType, ShiftAssignment } from '../types';
-import { 
-  filterAssignmentsByMonth, 
-  calculateHours, 
-  calculateSalary, 
-  formatVND 
+import {
+  filterAssignmentsByMonth,
+  calculateHours,
+  calculateSalary,
+  formatVND
 } from '../utils/calculations';
+import moment from 'moment';
 
 interface DashboardProps {
   employees: Employee[];
@@ -68,7 +69,7 @@ export default function Dashboard({
   // Today status
   const todayStr = new Date().toISOString().split('T')[0];
   const todayAssignments = assignments.filter(a => a.date === todayStr);
-  
+
   return (
     <div className="space-y-8">
       {/* Dashboard Header */}
@@ -164,7 +165,7 @@ export default function Dashboard({
 
       {/* Bottom Layout */}
       <div className="grid gap-6 lg:grid-cols-3">
-        
+
         {/* Left: Today's Shifts */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-1">
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
@@ -182,7 +183,7 @@ export default function Dashboard({
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <Briefcase className="h-10 w-10 text-slate-300" />
                 <p className="mt-2 text-sm font-medium text-slate-400">Hôm nay không có ca trực</p>
-                <button 
+                <button
                   onClick={() => setActiveTab('schedule')}
                   className="mt-3 text-xs font-semibold text-indigo-600 hover:underline"
                 >
@@ -193,7 +194,7 @@ export default function Dashboard({
               todayAssignments.map((assign) => {
                 const emp = employees.find((e) => e.id === assign.employee_id);
                 const shift = shiftTypes.find((s) => s.id === assign.shift_type_id);
-                
+
                 if (!emp || !shift) return null;
 
                 // Color map matching Tailwind classes
@@ -211,8 +212,13 @@ export default function Dashboard({
                       <h5 className="text-sm font-bold text-slate-800">{emp.name}</h5>
                       <p className="text-xs text-slate-500">Lương ca: {formatVND(shift.duration_hours * emp.hourly_rate)}</p>
                     </div>
-                    <span className={`rounded-lg border px-2.5 py-1 text-xs font-bold ${colorClasses[shift.color] || 'bg-slate-100 border-slate-200 text-slate-700'}`}>
-                      {shift.name} ({shift.start_time} - {shift.end_time})
+                    <span
+                      className={`rounded-lg border px-2.5 py-1 text-xs font-bold ${colorClasses[shift.color] || "bg-slate-100 border-slate-200 text-slate-700"
+                        }`}
+                    >
+                      {shift.name} (
+                      {moment(shift.start_time, "HH:mm:ss").format("HH:mm")} -{" "}
+                      {moment(shift.end_time, "HH:mm:ss").format("HH:mm")})
                     </span>
                   </div>
                 );
@@ -232,13 +238,13 @@ export default function Dashboard({
 
           {/* Grid split */}
           <div className="grid gap-6 md:grid-cols-2">
-            
+
             {/* Column A: Shift allocation */}
             <div>
               <h5 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Tần suất phân ca</h5>
               <div className="space-y-4">
                 {shiftBreakdown.map((shift) => {
-                  const percentage = totalShiftsScheduled > 0 
+                  const percentage = totalShiftsScheduled > 0
                     ? Math.round((shift.count / totalShiftsScheduled) * 100)
                     : 0;
 
@@ -257,7 +263,7 @@ export default function Dashboard({
                         <span>{shift.count} ca ({percentage}%)</span>
                       </div>
                       <div className="h-2.5 w-full rounded-full bg-slate-100 overflow-hidden">
-                        <div 
+                        <div
                           className={`h-full rounded-full ${barColors[shift.color] || 'bg-slate-500'} transition-all duration-500`}
                           style={{ width: `${percentage}%` }}
                         />
@@ -285,7 +291,7 @@ export default function Dashboard({
                         <span className="font-semibold text-slate-600">{hours} giờ / {formatVND(salary)}</span>
                       </div>
                       <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
-                        <div 
+                        <div
                           className="h-full bg-indigo-600 rounded-full"
                           style={{ width: `${percentage}%` }}
                         />

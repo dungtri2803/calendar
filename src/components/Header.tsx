@@ -1,4 +1,5 @@
 import {
+  CalendarDays,
   Database,
   LogOut,
   RefreshCw,
@@ -37,16 +38,25 @@ export default function Header({
 }: HeaderProps) {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md">
-      <div className="mx-auto max-w-8xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between gap-4">
+      <div className="mx-auto max-w-[1440px] px-3 sm:px-5 lg:px-8">
+        <div className="flex min-h-16 flex-wrap items-center justify-between gap-2 py-2 sm:gap-4">
           {/* Logo & Brand */}
+          <div className="flex min-w-0 items-center gap-2.5">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-sm shadow-indigo-100 sm:h-10 sm:w-10">
+              <CalendarDays className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="truncate text-base font-black tracking-tight text-slate-900 sm:text-lg">StaffFlow</h1>
+              <p className="hidden text-xs font-medium text-slate-500 sm:block">Lập lịch & tính lương</p>
+            </div>
+          </div>
 
           {/* Center Navigation Tabs (Admin only) */}
           {role === 'admin' && (
-            <nav className="hidden md:flex items-center gap-1">
+            <nav className="order-3 hidden w-full items-center gap-1 overflow-x-auto md:flex lg:order-none lg:w-auto">
               <button
                 onClick={() => setActiveTab('dashboard')}
-                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${activeTab === 'dashboard'
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${activeTab === 'dashboard'
                   ? 'bg-indigo-50 text-indigo-600'
                   : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                   }`}
@@ -55,7 +65,7 @@ export default function Header({
               </button>
               <button
                 onClick={() => setActiveTab('employees')}
-                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${activeTab === 'employees'
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${activeTab === 'employees'
                   ? 'bg-indigo-50 text-indigo-600'
                   : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                   }`}
@@ -65,7 +75,7 @@ export default function Header({
               </button>
               <button
                 onClick={() => setActiveTab('schedule')}
-                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${activeTab === 'schedule'
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${activeTab === 'schedule'
                   ? 'bg-indigo-50 text-indigo-600'
                   : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                   }`}
@@ -74,7 +84,7 @@ export default function Header({
               </button>
               <button
                 onClick={() => setActiveTab('payroll')}
-                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${activeTab === 'payroll'
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${activeTab === 'payroll'
                   ? 'bg-indigo-50 text-indigo-600'
                   : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                   }`}
@@ -83,7 +93,7 @@ export default function Header({
               </button>
               <button
                 onClick={() => setActiveTab('advances')}
-                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${activeTab === 'advances'
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${activeTab === 'advances'
                   ? 'bg-indigo-50 text-indigo-600'
                   : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                   }`}
@@ -95,7 +105,7 @@ export default function Header({
           )}
 
           {/* Right Operations */}
-          <div className="flex items-center gap-3 ml-auto md:ml-0">
+          <div className="ml-auto flex min-w-0 items-center gap-1.5 sm:gap-3 md:ml-0">
             {/* Sync Indicator */}
             <button
               onClick={triggerSync}
@@ -121,37 +131,37 @@ export default function Header({
             </button>
 
             {/* Role Selector Switch */}
-            <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-1 border border-slate-200">
+            <div className="flex shrink-0 items-center gap-1 rounded-xl border border-slate-200 bg-slate-100 p-1">
               <button
                 onClick={() => {
                   setRole('admin');
                   setActiveTab('dashboard');
                 }}
-                className={`flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all ${role === 'admin'
+                className={`flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-semibold transition-all sm:px-2.5 ${role === 'admin'
                   ? 'bg-white text-slate-950 shadow-sm'
                   : 'text-slate-500 hover:text-slate-900'
                   }`}
               >
                 <Shield className="h-3 w-3 text-indigo-500" />
-                <span>Admin</span>
+                <span className="hidden min-[380px]:inline">Admin</span>
               </button>
               <button
                 onClick={() => setRole('employee')}
-                className={`flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all ${role === 'employee'
+                className={`flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-semibold transition-all sm:px-2.5 ${role === 'employee'
                   ? 'bg-white text-slate-950 shadow-sm'
                   : 'text-slate-500 hover:text-slate-900'
                   }`}
               >
                 <User className="h-3 w-3 text-indigo-500" />
-                <span>Nhân viên</span>
+                <span className="hidden min-[380px]:inline">Nhân viên</span>
               </button>
             </div>
 
             {/* Active employee identity */}
             {role === 'employee' && employees.length > 0 && activeEmployeeId && activeEmployee && (
-              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 shadow-sm">
+              <div className="flex min-w-0 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2 py-1.5 shadow-sm sm:gap-2 sm:px-2.5">
                 <User className="h-3.5 w-3.5 text-indigo-500" />
-                <span className="max-w-[92px] truncate text-xs font-bold text-slate-700 sm:max-w-[160px]">
+                <span className="max-w-[70px] truncate text-xs font-bold text-slate-700 sm:max-w-[160px]">
                   {activeEmployee.name}
                 </span>
                 <button

@@ -163,14 +163,14 @@ export default function EmployeeManagement({
   return (
     <div className="space-y-6">
       {/* Section Title & Actions */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Hồ Sơ Nhân Viên</h2>
-          <p className="text-slate-500">Quản lý thông tin cơ bản, thiết lập mức lương theo giờ và theo dõi tổng giờ làm việc.</p>
+          <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">Hồ Sơ Nhân Viên</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-500 sm:text-base">Quản lý thông tin cơ bản, thiết lập mức lương theo giờ và theo dõi tổng giờ làm việc.</p>
         </div>
         <button
           onClick={handleNewClick}
-          className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
         >
           <UserPlus className="h-4 w-4" />
           Thêm nhân viên mới
@@ -178,8 +178,8 @@ export default function EmployeeManagement({
       </div>
 
       {/* Filters & Tools */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="relative flex-1 max-w-md">
+      <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4 md:flex-row md:items-center md:justify-between">
+        <div className="relative w-full md:max-w-md md:flex-1">
           <Search className="absolute top-2.5 left-3 h-4 w-4 text-slate-400" />
           <input
             type="text"
@@ -189,23 +189,23 @@ export default function EmployeeManagement({
             className="w-full rounded-xl border border-slate-200 pl-9 pr-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-slate-50/50"
           />
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Thống kê tháng:</span>
+        <div className="flex w-full flex-col gap-1.5 min-[420px]:flex-row min-[420px]:items-center min-[420px]:gap-2 md:w-auto">
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Thống kê tháng:</span>
           <input
             type="month"
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(e.target.value)}
-            className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-sm focus:border-indigo-500 focus:outline-none"
+            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 shadow-sm focus:border-indigo-500 focus:outline-none min-[420px]:w-auto min-[420px]:py-1.5"
           />
         </div>
       </div>
 
       {/* Form Modal / Sheet (Overlay when active) */}
       {isEditing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
-          <div className="w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl animate-scale-in">
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/60 p-0 backdrop-blur-sm animate-fade-in sm:items-center sm:p-4">
+          <div className="max-h-[92vh] w-full overflow-hidden rounded-t-2xl border border-slate-200 bg-white shadow-xl animate-scale-in sm:max-w-lg sm:rounded-2xl">
             <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 bg-slate-50">
-              <h3 className="font-bold text-slate-900">
+              <h3 className="pr-3 text-sm font-bold text-slate-900 sm:text-base">
                 {isEditing === 'new' ? 'Thêm Nhân Viên Mới' : 'Chỉnh Sửa Thông Tin Nhân Viên'}
               </h3>
               <button
@@ -216,7 +216,7 @@ export default function EmployeeManagement({
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="max-h-[calc(92vh-64px)] space-y-4 overflow-y-auto p-4 sm:p-6">
               {formError && (
                 <div className="flex items-center gap-2 rounded-xl bg-rose-50 border border-rose-200 p-3 text-sm text-rose-700">
                   <AlertCircle className="h-4 w-4 shrink-0" />
@@ -289,18 +289,18 @@ export default function EmployeeManagement({
               </div>
 
               {/* Footer buttons */}
-              <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
+              <div className="flex flex-col-reverse gap-2 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-end">
                 <button
                   type="button"
                   onClick={() => setIsEditing(null)}
-                  className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                  className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 sm:py-2"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50 sm:py-2"
                 >
                   {isSaving ? 'Đang lưu...' : 'Lưu thay đổi'}
                 </button>
@@ -324,7 +324,96 @@ export default function EmployeeManagement({
           </button>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <>
+        <div className="grid gap-3 md:hidden">
+          {filteredEmployees.map((emp) => {
+            const hours = calculateHours(emp.id, monthAssignments, shiftTypes);
+            const salary = calculateSalary(emp.id, monthAssignments, shiftTypes, emp.hourly_rate);
+            const isConfirmingDelete = confirmDeleteId === emp.id;
+            const birthDate = new Date(emp.dob);
+            const age = new Date().getFullYear() - birthDate.getFullYear();
+
+            return (
+              <div key={emp.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-indigo-100 bg-indigo-50 font-bold text-indigo-600">
+                    {emp.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate font-bold text-slate-900">{emp.name}</div>
+                    <div className="mt-0.5 text-xs text-slate-500">Mã số: {emp.id.substring(0, 8)}</div>
+                    <div className="mt-1 text-xs text-slate-500">
+                      {emp.dob.split('-').reverse().join('/')} ({age} tuổi)
+                    </div>
+                  </div>
+                  <span className={`shrink-0 rounded-full border px-2 py-1 text-[11px] font-bold ${
+                    emp.pin_hash
+                      ? 'border-emerald-100 bg-emerald-50 text-emerald-700'
+                      : 'border-amber-100 bg-amber-50 text-amber-700'
+                  }`}>
+                    {emp.pin_hash ? 'PIN' : 'Chưa PIN'}
+                  </span>
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
+                  <div className="rounded-xl bg-slate-50 p-3">
+                    <div className="font-bold uppercase tracking-wider text-slate-400">Lương/giờ</div>
+                    <div className="mt-1 font-black text-slate-800">{formatVND(emp.hourly_rate)}</div>
+                  </div>
+                  <div className="rounded-xl bg-indigo-50 p-3">
+                    <div className="font-bold uppercase tracking-wider text-indigo-400">Giờ làm</div>
+                    <div className="mt-1 font-black text-indigo-700">{hours} giờ</div>
+                  </div>
+                  <div className="col-span-2 rounded-xl bg-emerald-50 p-3">
+                    <div className="font-bold uppercase tracking-wider text-emerald-500">Thành tiền ({selectedMonth})</div>
+                    <div className="mt-1 text-base font-black text-emerald-700">{formatVND(salary)}</div>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex items-center justify-end gap-2 border-t border-slate-100 pt-3">
+                  {isConfirmingDelete ? (
+                    <div className="grid w-full grid-cols-[1fr_auto_auto] items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 p-1.5">
+                      <span className="px-1 text-xs font-semibold text-rose-700">Xóa vĩnh viễn?</span>
+                      <button
+                        onClick={() => handleDelete(emp.id)}
+                        className="rounded-lg bg-rose-600 p-2 text-white hover:bg-rose-500"
+                        title="Xác nhận xóa"
+                      >
+                        <Check className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        onClick={() => setConfirmDeleteId(null)}
+                        className="rounded-lg bg-slate-200 p-2 text-slate-700 hover:bg-slate-300"
+                        title="Hủy bỏ"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => handleEditClick(emp)}
+                        className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50"
+                      >
+                        <Edit className="h-3.5 w-3.5" />
+                        Sửa
+                      </button>
+                      <button
+                        onClick={() => setConfirmDeleteId(emp.id)}
+                        className="inline-flex items-center gap-1.5 rounded-xl border border-rose-100 px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Xóa
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm md:block">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
               <thead>
@@ -431,6 +520,7 @@ export default function EmployeeManagement({
             </table>
           </div>
         </div>
+        </>
       )}
     </div>
   );

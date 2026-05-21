@@ -120,24 +120,24 @@ export default function PayrollReports({
   return (
     <div className="space-y-6 print:space-y-4 print:bg-white">
       {/* Heading */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between print:hidden">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between print:hidden">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Tính Toán & Tổng Hợp Lương</h2>
-          <p className="text-slate-500">
+          <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">Tính Toán & Tổng Hợp Lương</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-500 sm:text-base">
             Hệ thống tự động tính tổng lương dựa trên tổng số giờ làm việc của nhân viên từ lịch trực ca.
           </p>
         </div>
-        <div className="flex items-center gap-2.5">
+        <div className="grid grid-cols-2 gap-2.5 sm:flex sm:items-center">
           <button
             onClick={handlePrint}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-600 shadow-sm hover:bg-slate-50"
+            className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-600 shadow-sm hover:bg-slate-50 sm:py-2"
           >
             <Printer className="h-4 w-4" />
             <span>In báo cáo</span>
           </button>
           <button
             onClick={handleExportCSV}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-3.5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-800"
+            className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-slate-900 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 sm:py-2"
           >
             <Download className="h-4 w-4" />
             <span>Xuất File Excel</span>
@@ -155,8 +155,8 @@ export default function PayrollReports({
       </div>
 
       {/* Filters panel */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-sm print:hidden">
-        <div className="relative flex-1 max-w-md">
+      <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm print:hidden sm:p-4 md:flex-row md:items-center md:justify-between">
+        <div className="relative w-full md:max-w-md md:flex-1">
           <Search className="absolute top-2.5 left-3 h-4 w-4 text-slate-400" />
           <input
             type="text"
@@ -166,13 +166,13 @@ export default function PayrollReports({
             className="w-full rounded-xl border border-slate-200 pl-9 pr-4 py-2 text-sm focus:border-indigo-500 focus:outline-none bg-slate-50/50"
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex w-full flex-col gap-1.5 min-[420px]:flex-row min-[420px]:items-center min-[420px]:gap-2 md:w-auto">
           <span className="text-sm font-semibold text-slate-600">Tháng tính lương:</span>
           <input
             type="month"
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(e.target.value)}
-            className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 shadow-sm focus:border-indigo-500 focus:outline-none"
+            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm focus:border-indigo-500 focus:outline-none min-[420px]:w-auto min-[420px]:py-1.5"
           />
         </div>
       </div>
@@ -240,7 +240,51 @@ export default function PayrollReports({
           <p className="mt-1 text-sm text-slate-500">Hãy thử phân ca cho nhân viên trước để hệ thống tính toán số giờ.</p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm print:border-0 print:shadow-none">
+        <>
+        <div className="grid gap-3 print:hidden md:hidden">
+          {filteredPayroll.map((p) => (
+            <div key={p.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="truncate font-bold text-slate-900">{p.name}</div>
+                  <div className="mt-0.5 text-xs text-slate-400">Mã NV: {p.id.substring(0, 8)}</div>
+                </div>
+                <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-800">
+                  {p.hours} giờ
+                </span>
+              </div>
+
+              <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
+                <div className="rounded-xl bg-slate-50 p-3">
+                  <div className="font-bold uppercase tracking-wider text-slate-400">Lương/giờ</div>
+                  <div className="mt-1 font-black text-slate-800">{formatVND(p.hourly_rate)}</div>
+                </div>
+                <div className="rounded-xl bg-indigo-50 p-3">
+                  <div className="font-bold uppercase tracking-wider text-indigo-400">Lương ca</div>
+                  <div className="mt-1 font-black text-indigo-700">{formatVND(p.salary)}</div>
+                </div>
+                <div className="rounded-xl bg-rose-50 p-3">
+                  <div className="font-bold uppercase tracking-wider text-rose-400">Tạm ứng</div>
+                  <div className="mt-1 font-black text-rose-600">{p.advance > 0 ? `-${formatVND(p.advance)}` : '0 ₫'}</div>
+                </div>
+                <div className="rounded-xl bg-emerald-50 p-3">
+                  <div className="font-bold uppercase tracking-wider text-emerald-500">Thực lĩnh</div>
+                  <div className="mt-1 font-black text-emerald-700">{formatVND(p.netSalary)}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+          <div className="rounded-2xl border border-indigo-100 bg-indigo-50 p-4">
+            <div className="text-xs font-bold uppercase tracking-wider text-indigo-500">Tổng cộng tháng {selectedMonth}</div>
+            <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
+              <span className="font-semibold text-slate-600">Giờ làm: <strong className="text-slate-900">{totalHours} giờ</strong></span>
+              <span className="font-semibold text-slate-600">Tạm ứng: <strong className="text-rose-600">-{formatVND(totalAdvance)}</strong></span>
+              <span className="col-span-2 text-base font-black text-indigo-700">Thực nhận: {formatVND(totalNetSalary)}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm print:block print:border-0 print:shadow-none md:block">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
               <thead>
@@ -303,6 +347,7 @@ export default function PayrollReports({
             </table>
           </div>
         </div>
+        </>
       )}
 
       {/* Disclaimer / Print Signature */}

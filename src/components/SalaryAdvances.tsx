@@ -137,8 +137,8 @@ export default function SalaryAdvances({
     <div className="space-y-6">
       {/* Heading */}
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Quản Lý Ứng Lương Nhân Viên</h2>
-        <p className="text-slate-500">
+        <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">Quản Lý Ứng Lương Nhân Viên</h2>
+        <p className="mt-1 text-sm leading-6 text-slate-500 sm:text-base">
           Ghi nhận và quản lý các khoản tạm ứng lương trong tháng của nhân viên. Các khoản này sẽ tự động khấu trừ vào bảng lương thực nhận.
         </p>
       </div>
@@ -146,7 +146,7 @@ export default function SalaryAdvances({
       {/* Grid Layout: Left form, Right Stats & List */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Left Form: Add Advance */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4 h-fit">
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-4 h-fit sm:p-5">
           <h3 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
             <PlusCircle className="h-5 w-5 text-indigo-500" />
             Ghi Nhận Ứng Lương Mới
@@ -169,7 +169,7 @@ export default function SalaryAdvances({
               <select
                 value={employeeId}
                 onChange={(e) => setEmployeeId(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-3 text-sm focus:border-indigo-500 focus:outline-none sm:py-2"
               >
                 <option value="">-- Chọn nhân viên --</option>
                 {employees.map((emp) => (
@@ -192,7 +192,7 @@ export default function SalaryAdvances({
                   placeholder="Ví dụ: 500,000"
                   value={amount}
                   onChange={(e) => handleAmountChange(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-3 pr-10 py-2 text-sm font-bold text-slate-800 focus:border-indigo-500 focus:outline-none"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-3 pr-10 py-3 text-sm font-bold text-slate-800 focus:border-indigo-500 focus:outline-none sm:py-2"
                 />
                 <span className="absolute right-3 top-2.5 text-xs font-extrabold text-slate-400">VND</span>
               </div>
@@ -208,7 +208,7 @@ export default function SalaryAdvances({
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm font-semibold text-slate-700 focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-3 text-sm font-semibold text-slate-700 focus:border-indigo-500 focus:outline-none sm:py-2"
               />
             </div>
 
@@ -223,7 +223,7 @@ export default function SalaryAdvances({
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none resize-none"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-3 text-sm focus:border-indigo-500 focus:outline-none resize-none sm:py-2"
               />
             </div>
 
@@ -231,7 +231,7 @@ export default function SalaryAdvances({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full inline-flex justify-center items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-4 shadow-md transition-colors"
+              className="w-full inline-flex justify-center items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 shadow-md transition-colors sm:py-2"
             >
               {isSubmitting ? 'Đang ghi nhận...' : 'Xác Nhận Ứng Lương'}
             </button>
@@ -288,10 +288,10 @@ export default function SalaryAdvances({
           </div>
 
           {/* List and Search Panel */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-4 sm:p-5">
             {/* Filter bar */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-4">
-              <div className="relative flex-1 max-w-sm">
+            <div className="flex flex-col gap-3 border-b border-slate-100 pb-4 md:flex-row md:items-center md:justify-between">
+              <div className="relative w-full md:max-w-sm md:flex-1">
                 <Search className="absolute top-2.5 left-3 h-4 w-4 text-slate-400" />
                 <input
                   type="text"
@@ -302,13 +302,13 @@ export default function SalaryAdvances({
                 />
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex w-full flex-col gap-1.5 min-[420px]:flex-row min-[420px]:items-center min-[420px]:gap-2 md:w-auto">
                 <span className="text-sm font-semibold text-slate-600">Tháng:</span>
                 <input
                   type="month"
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(e.target.value)}
-                  className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 shadow-sm focus:border-indigo-500 focus:outline-none"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm focus:border-indigo-500 focus:outline-none min-[420px]:w-auto min-[420px]:py-1.5"
                 />
               </div>
             </div>
@@ -321,7 +321,48 @@ export default function SalaryAdvances({
                 <p className="mt-1 text-xs text-slate-500">Thử thay đổi bộ lọc tìm kiếm hoặc ghi nhận khoản ứng đầu tiên.</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
+              <>
+              <div className="grid gap-3 md:hidden">
+                {filteredAdvances.map((adv) => {
+                  const emp = employees.find(e => e.id === adv.employee_id);
+                  return (
+                    <div key={adv.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="truncate font-bold text-slate-900">{emp?.name || 'Không xác định'}</div>
+                          <div className="mt-0.5 text-xs text-slate-400">Mã NV: {adv.employee_id.substring(0, 8)}</div>
+                          <div className="mt-1 text-xs font-semibold text-slate-500">{adv.date.split('-').reverse().join('/')}</div>
+                        </div>
+                        <div className="shrink-0 text-right">
+                          <div className="text-sm font-black text-rose-600">{formatVND(adv.amount)}</div>
+                          <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Tạm ứng</div>
+                        </div>
+                      </div>
+
+                      <div className="mt-3 rounded-xl bg-slate-50 p-3 text-xs font-medium leading-5 text-slate-600">
+                        {adv.notes || <span className="italic text-slate-400">Không có ghi chú</span>}
+                      </div>
+
+                      <div className="mt-3 flex justify-end border-t border-slate-100 pt-3">
+                        <button
+                          onClick={() => {
+                            if (confirm(`Bạn có chắc chắn muốn xóa khoản ứng lương ${formatVND(adv.amount)} của ${emp?.name || 'nhân viên này'}?`)) {
+                              onDeleteAdvance(adv.id);
+                            }
+                          }}
+                          className="inline-flex items-center gap-1.5 rounded-xl border border-rose-100 px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50"
+                          title="Xóa khoản ứng lương"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                          Xóa
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="hidden overflow-x-auto md:block">
                 <table className="w-full border-collapse text-left text-sm">
                   <thead>
                     <tr className="border-b border-slate-200 text-xs font-bold text-slate-400 uppercase tracking-wider bg-slate-50/50">
@@ -369,6 +410,7 @@ export default function SalaryAdvances({
                   </tbody>
                 </table>
               </div>
+              </>
             )}
           </div>
         </div>

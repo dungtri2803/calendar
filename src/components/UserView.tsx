@@ -1,21 +1,21 @@
 import { useState, useEffect } from 'react';
-import { 
-  Calendar, 
-  Clock, 
-  DollarSign, 
-  ChevronLeft, 
-  ChevronRight, 
-  User, 
+import {
+  Calendar,
+  Clock,
+  DollarSign,
+  ChevronLeft,
+  ChevronRight,
+  User,
   Sparkles,
   BadgeCheck,
   Coins
 } from 'lucide-react';
 import { Employee, ShiftType, ShiftAssignment, SalaryAdvance } from '../types';
-import { 
-  getOfWeekDates, 
-  formatDateString, 
-  calculateHours, 
-  calculateSalary, 
+import {
+  getOfWeekDates,
+  formatDateString,
+  calculateHours,
+  calculateSalary,
   formatVND,
   filterAssignmentsByMonth
 } from '../utils/calculations';
@@ -95,8 +95,8 @@ export default function UserView({
   const weekLabel = referenceDate.toLocaleDateString('vi-VN', { month: 'long', year: 'numeric' });
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
-      
+    <div className="space-y-6 max-w-8xl mx-auto">
+
       {/* Welcome Banner */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-700 p-6 text-white shadow-md">
         <div className="relative z-10 space-y-2">
@@ -167,11 +167,11 @@ export default function UserView({
 
       {/* Grid layout: Calendar & Information details */}
       <div className="grid gap-6 md:grid-cols-3 items-start">
-        
+
         {/* Left panel: Weekly Schedule (2 cols) */}
         <div className="md:col-span-2 space-y-4">
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
-            
+
             {/* Nav calendar header */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
               <div className="flex items-center gap-1">
@@ -207,26 +207,24 @@ export default function UserView({
                 const dateStr = formatDateString(date);
                 const isToday = dateStr === new Date().toISOString().split('T')[0];
                 const dayName = DAY_NAMES_VN[date.getDay()];
-                
+
                 // Get shifts assigned to THIS employee on THIS day
                 const dayShifts = assignments.filter(
                   (a) => a.employee_id === employee.id && a.date === dateStr
                 );
 
                 return (
-                  <div 
-                    key={idx} 
-                    className={`rounded-xl border p-3 flex flex-col justify-between min-h-[110px] shadow-2xs transition-all ${
-                      isToday 
-                        ? 'bg-indigo-50/40 border-indigo-300 scale-102 ring-1 ring-indigo-200' 
+                  <div
+                    key={idx}
+                    className={`rounded-xl border p-3 flex flex-col justify-between min-h-[110px] shadow-2xs transition-all ${isToday
+                        ? 'bg-indigo-50/40 border-indigo-300 scale-102 ring-1 ring-indigo-200'
                         : 'bg-slate-50/40 border-slate-150 hover:bg-slate-50'
-                    }`}
+                      }`}
                   >
                     <div className="border-b border-slate-100 pb-1.5 flex justify-between items-center">
                       <span className="text-[10px] font-bold text-slate-400 uppercase">{dayName}</span>
-                      <span className={`text-xs font-extrabold rounded-full h-5 w-5 flex items-center justify-center ${
-                        isToday ? 'bg-indigo-600 text-white' : 'text-slate-700'
-                      }`}>
+                      <span className={`text-xs font-extrabold rounded-full h-5 w-5 flex items-center justify-center ${isToday ? 'bg-indigo-600 text-white' : 'text-slate-700'
+                        }`}>
                         {date.getDate()}
                       </span>
                     </div>
@@ -245,8 +243,8 @@ export default function UserView({
                             dot: 'bg-slate-500'
                           };
                           return (
-                            <div 
-                              key={assign.id} 
+                            <div
+                              key={assign.id}
                               className={`rounded-lg border px-1.5 py-1 text-[9px] font-bold text-center ${details.bg} ${details.border} ${details.text}`}
                               title={`${shift.name}: ${shift.start_time} - ${shift.end_time}`}
                             >

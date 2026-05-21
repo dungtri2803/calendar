@@ -47,7 +47,7 @@ export default function EmployeeLogin({ employees, onLogin }: EmployeeLoginProps
 
   if (employees.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white py-16 text-center max-w-md mx-auto mt-12">
+      <div className="mx-auto mt-8 flex max-w-md flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white px-4 py-12 text-center sm:mt-12 sm:py-16">
         <AlertCircle className="h-12 w-12 text-amber-500" />
         <h3 className="mt-4 text-lg font-bold text-slate-900">Chưa có nhân sự nào khả dụng</h3>
         <p className="mt-1 text-sm text-slate-500">Hãy chuyển lại vai trò Admin và khởi tạo nhân viên trước.</p>
@@ -56,13 +56,13 @@ export default function EmployeeLogin({ employees, onLogin }: EmployeeLoginProps
   }
 
   return (
-    <div className="mx-auto mt-8 max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="mx-auto mt-4 max-w-md rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:mt-8 sm:p-6">
       <div className="mb-6 text-center">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
           <UserCheck className="h-6 w-6" />
         </div>
-        <h2 className="mt-4 text-xl font-black tracking-tight text-slate-900">Đăng nhập nhân viên</h2>
-        <p className="mt-1.5 text-sm text-slate-500">
+        <h2 className="mt-4 text-lg font-black tracking-tight text-slate-900 sm:text-xl">Đăng nhập nhân viên</h2>
+        <p className="mt-1.5 text-sm leading-6 text-slate-500">
           Chọn đúng hồ sơ và nhập mã PIN do Admin cấp để xem lịch làm việc, giờ công và lương tạm tính của riêng bạn.
         </p>
       </div>
@@ -82,7 +82,7 @@ export default function EmployeeLogin({ employees, onLogin }: EmployeeLoginProps
                 setEmployeeId(event.target.value);
                 setError('');
               }}
-              className="block w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2.5 pl-10 pr-3 text-sm font-semibold text-slate-800 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+              className="block w-full rounded-xl border border-slate-200 bg-slate-50/50 py-3 pl-10 pr-3 text-sm font-semibold text-slate-800 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 sm:py-2.5"
             >
               <option value="">-- Chọn tên của bạn --</option>
               {employees.map((emp) => (
@@ -111,7 +111,7 @@ export default function EmployeeLogin({ employees, onLogin }: EmployeeLoginProps
                 setError('');
               }}
               placeholder="Nhập PIN 4-8 số"
-              className="block w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2.5 pl-10 pr-3 text-sm font-semibold text-slate-800 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+              className="block w-full rounded-xl border border-slate-200 bg-slate-50/50 py-3 pl-10 pr-3 text-sm font-semibold text-slate-800 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 sm:py-2.5"
             />
           </div>
         </div>
@@ -125,7 +125,7 @@ export default function EmployeeLogin({ employees, onLogin }: EmployeeLoginProps
 
         <button
           type="submit"
-          className="w-full rounded-xl bg-indigo-600 py-2.5 text-sm font-bold text-white shadow-md shadow-indigo-100 transition-colors hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-300 disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full rounded-xl bg-indigo-600 py-3 text-sm font-bold text-white shadow-md shadow-indigo-100 transition-colors hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-300 disabled:cursor-not-allowed disabled:opacity-60 sm:py-2.5"
           disabled={!employeeId || !pin || isSubmitting}
         >
           {isSubmitting ? 'Đang kiểm tra...' : 'Xem lịch và lương của tôi'}
