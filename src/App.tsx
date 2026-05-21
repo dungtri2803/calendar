@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { 
-  X, 
-  AlertCircle, 
-  CheckCircle, 
+import {
+  X,
+  AlertCircle,
+  CheckCircle,
   Info
 } from 'lucide-react';
 import { db, getSupabaseConfig } from './utils/db';
@@ -26,13 +26,13 @@ export default function App() {
   });
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [isAdminLoginOpen, setIsAdminLoginOpen] = useState<boolean>(false);
-  
+
   // Core DB States
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [shiftTypes, setShiftTypes] = useState<ShiftType[]>([]);
   const [assignments, setAssignments] = useState<ShiftAssignment[]>([]);
   const [salaryAdvances, setSalaryAdvances] = useState<SalaryAdvance[]>([]);
-  
+
   // Active employee session for personal workspace
   const [activeEmployeeId, setActiveEmployeeId] = useState<string>(() => {
     return localStorage.getItem('active_employee_id') || '';
@@ -41,7 +41,7 @@ export default function App() {
   // Database configuration
   const [dbConfig, setDbConfig] = useState<SupabaseConfig>(getSupabaseConfig);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
-  
+
   // Toast notification queue
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
 
@@ -49,7 +49,7 @@ export default function App() {
   const addNotification = useCallback((type: AppNotification['type'], message: string) => {
     const id = Math.random().toString(36).substring(2, 9);
     setNotifications(prev => [...prev, { id, type, message }]);
-    
+
     // Auto dismiss
     setTimeout(() => {
       setNotifications(prev => prev.filter(n => n.id !== id));
@@ -81,14 +81,14 @@ export default function App() {
     try {
       const fetchedEmployees = await db.getEmployees();
       const fetchedShiftTypes = await db.getShiftTypes();
-      
+
       // Set a date range wide enough to load all assignments for current month calculations (e.g. ±1 year)
       const today = new Date();
       const startYear = today.getFullYear() - 1;
       const endYear = today.getFullYear() + 1;
       const fetchedAssignments = await db.getAssignments(`${startYear}-01-01`, `${endYear}-12-31`);
       const fetchedSalaryAdvances = await db.getSalaryAdvances(`${startYear}-01-01`, `${endYear}-12-31`);
-      
+
       setEmployees(fetchedEmployees);
       setShiftTypes(fetchedShiftTypes);
       setAssignments(fetchedAssignments);
@@ -96,7 +96,7 @@ export default function App() {
     } catch (error: any) {
       console.error(error);
       addNotification(
-        'error', 
+        'error',
         `Lỗi tải dữ liệu: ${error.message || 'Không kết nối được cơ sở dữ liệu. Vui lòng kiểm tra cấu hình kết nối.'}`
       );
     } finally {
@@ -119,7 +119,7 @@ export default function App() {
     setSalaryAdvances([]);
     // Fetch fresh data
     addNotification('info', newConfig.isEnabled ? 'Đang kết nối đến Supabase...' : 'Đã chuyển sang chế độ Offline Demo.');
-    
+
     // Small timeout to let configuration persist in localStorage
     setTimeout(() => {
       loadAllData();
@@ -159,7 +159,7 @@ export default function App() {
       const targetName = employees.find(e => e.id === id)?.name || '';
       await db.deleteEmployee(id);
       addNotification('success', `Đã xóa nhân viên ${targetName} khỏi danh sách.`);
-      
+
       // Clear active selection if it was deleted
       if (activeEmployeeId === id) {
         setActiveEmployeeId('');
@@ -207,7 +207,7 @@ export default function App() {
     try {
       const empName = employees.find(e => e.id === employeeId)?.name || '';
       const shiftName = shiftTypes.find(s => s.id === shiftTypeId)?.name || '';
-      
+
       await db.addAssignment(employeeId, date, shiftTypeId);
       addNotification('success', `Đã xếp ${shiftName} cho ${empName} vào ${date.split('-').reverse().join('/')}`);
       await loadAllData();
@@ -305,7 +305,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-700 antialiased">
-      
+
       {/* Header Component */}
       <Header
         role={role}
@@ -322,8 +322,8 @@ export default function App() {
       />
 
       {/* Main Content container */}
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        
+      <main className="mx-auto max-w-8xl px-4 py-8 sm:px-6 lg:px-8">
+
         {role === 'admin' ? (
           /* ADMIN DASHBOARD TABS */
           <div className="animate-fade-in">
@@ -407,25 +407,24 @@ export default function App() {
         {notifications.map((note) => (
           <div
             key={note.id}
-            className={`pointer-events-auto flex items-start gap-3 rounded-xl border p-4 shadow-lg transition-all duration-300 animate-slide-up ${
-              note.type === 'success' 
-                ? 'bg-white border-emerald-200 text-emerald-800 shadow-emerald-100/50' 
-                : note.type === 'error' 
-                ? 'bg-white border-rose-200 text-rose-800 shadow-rose-100/50' 
-                : note.type === 'warning'
-                ? 'bg-white border-amber-200 text-amber-800 shadow-amber-100/50'
-                : 'bg-white border-indigo-200 text-indigo-800 shadow-indigo-100/50'
-            }`}
+            className={`pointer-events-auto flex items-start gap-3 rounded-xl border p-4 shadow-lg transition-all duration-300 animate-slide-up ${note.type === 'success'
+                ? 'bg-white border-emerald-200 text-emerald-800 shadow-emerald-100/50'
+                : note.type === 'error'
+                  ? 'bg-white border-rose-200 text-rose-800 shadow-rose-100/50'
+                  : note.type === 'warning'
+                    ? 'bg-white border-amber-200 text-amber-800 shadow-amber-100/50'
+                    : 'bg-white border-indigo-200 text-indigo-800 shadow-indigo-100/50'
+              }`}
           >
             {note.type === 'success' && <CheckCircle className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />}
             {note.type === 'error' && <AlertCircle className="h-5 w-5 text-rose-500 shrink-0 mt-0.5" />}
             {note.type === 'warning' && <AlertCircle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />}
             {note.type === 'info' && <Info className="h-5 w-5 text-indigo-500 shrink-0 mt-0.5" />}
-            
+
             <div className="flex-1 text-xs font-semibold leading-relaxed">
               {note.message}
             </div>
-            
+
             <button
               onClick={() => setNotifications(prev => prev.filter(n => n.id !== note.id))}
               className="rounded-lg p-0.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 shrink-0"
@@ -446,7 +445,7 @@ export default function App() {
 
       {/* Footer */}
       <footer className="mt-12 border-t border-slate-200 bg-white py-8 print:hidden">
-        <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8 space-y-3">
+        <div className="mx-auto max-w-8xl px-4 text-center sm:px-6 lg:px-8 space-y-3">
           <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
             StaffFlow — Hệ thống sắp xếp ca & Tự động tính lương nhân sự
           </p>

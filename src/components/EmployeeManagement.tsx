@@ -1,23 +1,23 @@
 import { useState } from 'react';
-import { 
-  UserPlus, 
+import {
+  UserPlus,
   Users,
-  Edit, 
-  Trash2, 
-  DollarSign, 
-  Calendar, 
+  Edit,
+  Trash2,
+  DollarSign,
+  Calendar,
   KeyRound,
-  Search, 
-  Check, 
-  X, 
-  AlertCircle 
+  Search,
+  Check,
+  X,
+  AlertCircle
 } from 'lucide-react';
 import { Employee, ShiftAssignment, ShiftType } from '../types';
-import { 
-  calculateHours, 
-  calculateSalary, 
-  formatVND, 
-  filterAssignmentsByMonth 
+import {
+  calculateHours,
+  calculateSalary,
+  formatVND,
+  filterAssignmentsByMonth
 } from '../utils/calculations';
 import { hashEmployeePin, isValidPin } from '../utils/auth';
 
@@ -40,7 +40,7 @@ export default function EmployeeManagement({
 }: EmployeeManagementProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [isEditing, setIsEditing] = useState<string | null>(null); // employee.id or 'new'
-  
+
   // Form values
   const [name, setName] = useState('');
   const [dob, setDob] = useState('');
@@ -316,7 +316,7 @@ export default function EmployeeManagement({
           <Users className="h-12 w-12 text-slate-300" />
           <h4 className="mt-4 text-lg font-bold text-slate-900">Không tìm thấy nhân viên nào</h4>
           <p className="mt-1 text-sm text-slate-500">Thử thay đổi từ khóa tìm kiếm hoặc thêm nhân viên mới.</p>
-          <button 
+          <button
             onClick={handleNewClick}
             className="mt-4 text-sm font-semibold text-indigo-600 hover:underline"
           >
@@ -369,11 +369,10 @@ export default function EmployeeManagement({
                         {formatVND(emp.hourly_rate)} <span className="text-xs font-normal text-slate-400">/h</span>
                       </td>
                       <td className="px-6 py-4.5 text-center">
-                        <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-bold ${
-                          emp.pin_hash
-                            ? 'border-emerald-100 bg-emerald-50 text-emerald-700'
-                            : 'border-amber-100 bg-amber-50 text-amber-700'
-                        }`}>
+                        <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-bold ${emp.pin_hash
+                          ? 'border-emerald-100 bg-emerald-50 text-emerald-700'
+                          : 'border-amber-100 bg-amber-50 text-amber-700'
+                          }`}>
                           {emp.pin_hash ? 'Đã đặt' : 'Chưa đặt'}
                         </span>
                       </td>

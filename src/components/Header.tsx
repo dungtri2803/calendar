@@ -1,16 +1,12 @@
 import {
-  Users,
-  CalendarDays,
-  CreditCard,
   Database,
-  Shield,
-  User,
-  Sparkles,
+  LogOut,
   RefreshCw,
-  Coins,
-  LogOut
+  Shield,
+  Sparkles,
+  User
 } from 'lucide-react';
-import { Employee, UserRole, SupabaseConfig } from '../types';
+import { Employee, SupabaseConfig, UserRole } from '../types';
 
 interface HeaderProps {
   role: UserRole;
@@ -41,18 +37,9 @@ export default function Header({
 }: HeaderProps) {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-8xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo & Brand */}
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md shadow-indigo-100">
-              <CalendarDays className="h-5 w-5" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold tracking-tight text-slate-900">StaffFlow</h1>
-              <p className="text-xs font-medium text-slate-500">Lập Lịch & Tính Lương</p>
-            </div>
-          </div>
 
           {/* Center Navigation Tabs (Admin only) */}
           {role === 'admin' && (
@@ -73,7 +60,7 @@ export default function Header({
                   : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                   }`}
               >
-                <Users className="h-4 w-4" />
+
                 Nhân viên
               </button>
               <button
@@ -83,7 +70,6 @@ export default function Header({
                   : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                   }`}
               >
-                <CalendarDays className="h-4 w-4" />
                 Lịch làm việc
               </button>
               <button
@@ -93,7 +79,6 @@ export default function Header({
                   : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                   }`}
               >
-                <CreditCard className="h-4 w-4" />
                 Tính lương
               </button>
               <button
@@ -103,7 +88,6 @@ export default function Header({
                   : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                   }`}
               >
-                <Coins className="h-4 w-4" />
                 Ứng lương
               </button>
 
@@ -125,7 +109,7 @@ export default function Header({
               {dbConfig.isEnabled ? (
                 <>
                   <Database className="h-3 w-3 text-emerald-500 animate-pulse" />
-                  <span>Supabase Live</span>
+
                 </>
               ) : (
                 <>
