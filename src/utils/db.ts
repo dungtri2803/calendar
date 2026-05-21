@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { Employee, ShiftType, ShiftAssignment, SupabaseConfig } from '../types';
+import { Employee, ShiftType, ShiftAssignment, SupabaseConfig, SalaryAdvance } from '../types';
 
 const supabaseUrl = "https://erwngfytlufpzmzdiejl.supabase.co";
 const supabaseKey = "sb_publishable_12As9c9rqbB10Byyh-S9AA_RbA98pBU";
@@ -53,15 +53,28 @@ CREATE TABLE shift_assignments (
     UNIQUE(employee_id, date, shift_type_id)
 );
 
+-- 4. Bảng ứng lương (salary_advances)
+CREATE TABLE salary_advances (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    employee_id UUID REFERENCES employees(id) ON DELETE CASCADE NOT NULL,
+    date DATE NOT NULL,
+    amount NUMERIC(12, 2) NOT NULL,
+    notes TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()) NOT NULL
+);
+
 -- Thêm chỉ mục (index) để tối ưu truy vấn lịch
 CREATE INDEX idx_shift_assignments_date ON shift_assignments(date);
 CREATE INDEX idx_shift_assignments_emp ON shift_assignments(employee_id);
+CREATE INDEX idx_salary_advances_date ON salary_advances(date);
+CREATE INDEX idx_salary_advances_emp ON salary_advances(employee_id);
 
 -- Cấu hình Row-Level Security (RLS)
 -- Tắt RLS để ứng dụng client có thể đọc/ghi dữ liệu trực tiếp bằng anon key
 ALTER TABLE employees DISABLE ROW LEVEL SECURITY;
 ALTER TABLE shift_types DISABLE ROW LEVEL SECURITY;
 ALTER TABLE shift_assignments DISABLE ROW LEVEL SECURITY;
+ALTER TABLE salary_advances DISABLE ROW LEVEL SECURITY;
 
 -- Thêm dữ liệu mẫu mặc định
 INSERT INTO employees (name, dob, hourly_rate) VALUES
@@ -256,5 +269,38 @@ export const db = {
     const count = insData ? insData.length : 0;
 
     return { count };
+  },
+
+  // SALARY ADVANCES API
+  async getSalaryAdvances(startDate: string, endDate: string): Promise<SalaryAdvance[]> {
+    const { data, error } = await supabase
+      .from('salary_advances')
+      .select('*')
+      .gte('date', startDate)
+      .lte('date', endDate)
+      .order('date', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  },
+
+  async addSalaryAdvance(advance: Omit<SalaryAdvance, 'id'>): Promise<SalaryAdvance> {
+    const { data, error } = await supabase
+      .from('salary_advances')
+      .insert({
+        employee_id: advance.employee_id,
+        date: advance.date,
+        amount: Number(advance.amount),
+        notes: advance.notes || null,
+      })
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteSalaryAdvance(id: string): Promise<boolean> {
+    const { error } = await supabase.from('salary_advances').delete().eq('id', id);
+    if (error) throw error;
+    return true;
   },
 };

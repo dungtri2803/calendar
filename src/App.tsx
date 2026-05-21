@@ -6,13 +6,14 @@ import {
   Info
 } from 'lucide-react';
 import { db, getSupabaseConfig } from './utils/db';
-import { Employee, ShiftType, ShiftAssignment, UserRole, SupabaseConfig, AppNotification } from './types';
+import { Employee, ShiftType, ShiftAssignment, UserRole, SupabaseConfig, AppNotification, SalaryAdvance } from './types';
 
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
 import EmployeeManagement from './components/EmployeeManagement';
 import ShiftScheduler from './components/ShiftScheduler';
 import PayrollReports from './components/PayrollReports';
+import SalaryAdvances from './components/SalaryAdvances';
 import SupabaseSettings from './components/SupabaseSettings';
 import UserView from './components/UserView';
 import AdminLoginModal from './components/AdminLoginModal';
@@ -29,6 +30,7 @@ export default function App() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [shiftTypes, setShiftTypes] = useState<ShiftType[]>([]);
   const [assignments, setAssignments] = useState<ShiftAssignment[]>([]);
+  const [salaryAdvances, setSalaryAdvances] = useState<SalaryAdvance[]>([]);
   
   // Active logged in simulated employee for user workspace
   const [activeEmployeeId, setActiveEmployeeId] = useState<string>('');
@@ -81,10 +83,12 @@ export default function App() {
       const startYear = today.getFullYear() - 1;
       const endYear = today.getFullYear() + 1;
       const fetchedAssignments = await db.getAssignments(`${startYear}-01-01`, `${endYear}-12-31`);
+      const fetchedSalaryAdvances = await db.getSalaryAdvances(`${startYear}-01-01`, `${endYear}-12-31`);
       
       setEmployees(fetchedEmployees);
       setShiftTypes(fetchedShiftTypes);
       setAssignments(fetchedAssignments);
+      setSalaryAdvances(fetchedSalaryAdvances);
 
       // Set default active employee if none selected
       if (fetchedEmployees.length > 0 && !activeEmployeeId) {
@@ -113,6 +117,7 @@ export default function App() {
     setEmployees([]);
     setShiftTypes([]);
     setAssignments([]);
+    setSalaryAdvances([]);
     // Fetch fresh data
     addNotification('info', newConfig.isEnabled ? 'Đang kết nối đến Supabase...' : 'Đã chuyển sang chế độ Offline Demo.');
     
@@ -241,6 +246,34 @@ export default function App() {
     }
   };
 
+  // SALARY ADVANCES HANDLERS
+  const handleAddSalaryAdvance = async (advanceData: Omit<SalaryAdvance, 'id'>) => {
+    setIsSyncing(true);
+    try {
+      const newAdvance = await db.addSalaryAdvance(advanceData);
+      const empName = employees.find(e => e.id === advanceData.employee_id)?.name || '';
+      addNotification('success', `Đã ghi nhận ứng lương cho ${empName}: ${newAdvance.amount.toLocaleString('vi-VN')}đ`);
+      await loadAllData();
+    } catch (error: any) {
+      addNotification('error', `Lỗi thêm khoản ứng lương: ${error.message}`);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const handleDeleteSalaryAdvance = async (id: string) => {
+    setIsSyncing(true);
+    try {
+      await db.deleteSalaryAdvance(id);
+      addNotification('success', 'Đã xóa khoản ứng lương.');
+      await loadAllData();
+    } catch (error: any) {
+      addNotification('error', `Lỗi xóa khoản ứng lương: ${error.message}`);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
 
 
   const activeEmployee = employees.find(e => e.id === activeEmployeeId) || employees[0];
@@ -306,6 +339,16 @@ export default function App() {
                 employees={employees}
                 shiftTypes={shiftTypes}
                 assignments={assignments}
+                salaryAdvances={salaryAdvances}
+              />
+            )}
+
+            {activeTab === 'advances' && (
+              <SalaryAdvances
+                employees={employees}
+                salaryAdvances={salaryAdvances}
+                onAddAdvance={handleAddSalaryAdvance}
+                onDeleteAdvance={handleDeleteSalaryAdvance}
               />
             )}
 
@@ -323,6 +366,7 @@ export default function App() {
                 employee={activeEmployee}
                 shiftTypes={shiftTypes}
                 assignments={assignments}
+                salaryAdvances={salaryAdvances}
               />
             ) : (
               <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white py-16 text-center max-w-md mx-auto mt-12">

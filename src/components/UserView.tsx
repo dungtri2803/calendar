@@ -7,9 +7,10 @@ import {
   ChevronRight, 
   User, 
   Sparkles,
-  BadgeCheck
+  BadgeCheck,
+  Coins
 } from 'lucide-react';
-import { Employee, ShiftType, ShiftAssignment } from '../types';
+import { Employee, ShiftType, ShiftAssignment, SalaryAdvance } from '../types';
 import { 
   getOfWeekDates, 
   formatDateString, 
@@ -23,6 +24,7 @@ interface UserViewProps {
   employee: Employee;
   shiftTypes: ShiftType[];
   assignments: ShiftAssignment[];
+  salaryAdvances: SalaryAdvance[];
 }
 
 const DAY_NAMES_VN = [
@@ -47,6 +49,7 @@ export default function UserView({
   employee,
   shiftTypes,
   assignments,
+  salaryAdvances,
 }: UserViewProps) {
   const [referenceDate, setReferenceDate] = useState<Date>(new Date());
   const [weekDates, setWeekDates] = useState<Date[]>([]);
@@ -82,6 +85,13 @@ export default function UserView({
   const totalSalaryMonth = calculateSalary(employee.id, currentMonthAssignments, shiftTypes, employee.hourly_rate);
   const totalShiftsMonth = currentMonthAssignments.filter(a => a.employee_id === employee.id).length;
 
+  // Monthly personal advances
+  const totalAdvancesMonth = salaryAdvances
+    .filter(adv => adv.employee_id === employee.id && adv.date.startsWith(currentMonthYear))
+    .reduce((sum, adv) => sum + Number(adv.amount), 0);
+
+  const netSalaryMonth = Math.max(0, totalSalaryMonth - totalAdvancesMonth);
+
   const weekLabel = referenceDate.toLocaleDateString('vi-VN', { month: 'long', year: 'numeric' });
 
   return (
@@ -105,7 +115,7 @@ export default function UserView({
       </div>
 
       {/* Monthly Summary Widget Cards */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-4">
         {/* Card A: Hours */}
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm flex items-center gap-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
@@ -113,7 +123,7 @@ export default function UserView({
           </div>
           <div>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Công làm tháng này</p>
-            <h4 className="text-xl font-black text-slate-800 mt-0.5">{totalHoursMonth} <span className="text-xs font-normal text-slate-400">giờ</span></h4>
+            <h4 className="text-lg font-black text-slate-800 mt-0.5">{totalHoursMonth} <span className="text-xs font-normal text-slate-400">giờ</span></h4>
             <p className="text-[10px] text-slate-400 mt-0.5">Ước tính qua {totalShiftsMonth} ca trực</p>
           </div>
         </div>
@@ -125,20 +135,32 @@ export default function UserView({
           </div>
           <div>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Mức lương theo giờ</p>
-            <h4 className="text-xl font-black text-slate-800 mt-0.5">{formatVND(employee.hourly_rate)}</h4>
+            <h4 className="text-lg font-black text-slate-800 mt-0.5">{formatVND(employee.hourly_rate)}</h4>
             <p className="text-[10px] text-slate-400 mt-0.5">Được cấu hình cố định</p>
           </div>
         </div>
 
-        {/* Card C: Salary */}
+        {/* Card C: Advance */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm flex items-center gap-4">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+            <Coins className="h-6 w-6" />
+          </div>
+          <div>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Đã tạm ứng tháng</p>
+            <h4 className="text-lg font-black text-amber-600 mt-0.5">{formatVND(totalAdvancesMonth)}</h4>
+            <p className="text-[10px] text-slate-400 mt-0.5">Số tiền đã ứng trước</p>
+          </div>
+        </div>
+
+        {/* Card D: Net Salary */}
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm flex items-center gap-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-600">
             <DollarSign className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Lương tạm tính tháng</p>
-            <h4 className="text-xl font-black text-rose-600 mt-0.5">{formatVND(totalSalaryMonth)}</h4>
-            <p className="text-[10px] text-slate-400 mt-0.5">Tổng giờ nhân mức lương/giờ</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Thực lĩnh tạm tính</p>
+            <h4 className="text-lg font-black text-rose-600 mt-0.5">{formatVND(netSalaryMonth)}</h4>
+            <p className="text-[10px] text-slate-400 mt-0.5">Lương gốc: {formatVND(totalSalaryMonth)}</p>
           </div>
         </div>
       </div>

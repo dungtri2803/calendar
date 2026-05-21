@@ -8,7 +8,7 @@ import {
   DollarSign,
   FileText
 } from 'lucide-react';
-import { Employee, ShiftType, ShiftAssignment } from '../types';
+import { Employee, ShiftType, ShiftAssignment, SalaryAdvance } from '../types';
 import { 
   calculateHours, 
   calculateSalary, 
@@ -20,12 +20,14 @@ interface PayrollReportsProps {
   employees: Employee[];
   shiftTypes: ShiftType[];
   assignments: ShiftAssignment[];
+  salaryAdvances: SalaryAdvance[];
 }
 
 export default function PayrollReports({
   employees,
   shiftTypes,
   assignments,
+  salaryAdvances,
 }: PayrollReportsProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMonth, setSelectedMonth] = useState(() => {
@@ -38,14 +40,24 @@ export default function PayrollReports({
   // Filter assignments by month
   const monthAssignments = filterAssignmentsByMonth(assignments, selectedMonth);
 
+  // Filter advances by month
+  const monthAdvances = salaryAdvances.filter((adv) => adv.date.startsWith(selectedMonth));
+
   // Build payroll rows
   const payrollData = employees.map((emp) => {
     const hours = calculateHours(emp.id, monthAssignments, shiftTypes);
     const salary = calculateSalary(emp.id, monthAssignments, shiftTypes, emp.hourly_rate);
+    const advance = monthAdvances
+      .filter((adv) => adv.employee_id === emp.id)
+      .reduce((sum, adv) => sum + Number(adv.amount), 0);
+    const netSalary = Math.max(0, salary - advance);
+
     return {
       ...emp,
       hours,
       salary,
+      advance,
+      netSalary,
     };
   });
 
@@ -57,6 +69,8 @@ export default function PayrollReports({
   // Calculate statistics
   const totalHours = payrollData.reduce((sum, p) => sum + p.hours, 0);
   const totalSalary = payrollData.reduce((sum, p) => sum + p.salary, 0);
+  const totalAdvance = payrollData.reduce((sum, p) => sum + p.advance, 0);
+  const totalNetSalary = payrollData.reduce((sum, p) => sum + p.netSalary, 0);
   
   // Find highest paid and hardest working
   const topEarner = payrollData.length > 0
@@ -70,7 +84,7 @@ export default function PayrollReports({
   // Export CSV
   const handleExportCSV = () => {
     const [year, month] = selectedMonth.split('-');
-    const headers = ['Mã NV', 'Họ và tên', 'Ngày sinh', 'Mức lương/Giờ (VND)', 'Tổng giờ làm', `Lương tháng ${month}/${year} (VND)`];
+    const headers = ['Mã NV', 'Họ và tên', 'Ngày sinh', 'Mức lương/Giờ (VND)', 'Tổng giờ làm', `Lương tháng ${month}/${year} (VND)`, 'Tạm ứng (VND)', 'Thực nhận (VND)'];
     
     const rows = payrollData.map((p) => [
       p.id,
@@ -79,6 +93,8 @@ export default function PayrollReports({
       p.hourly_rate,
       p.hours,
       p.salary,
+      p.advance,
+      p.netSalary,
     ]);
 
     const csvContent = 
@@ -169,9 +185,9 @@ export default function PayrollReports({
             <DollarSign className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Tổng quỹ lương tháng</p>
-            <h4 className="text-xl font-extrabold text-slate-900 mt-0.5">{formatVND(totalSalary)}</h4>
-            <p className="text-[10px] text-slate-500 mt-0.5">Tháng {monthStr}/{yearStr}</p>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Tổng thực nhận tháng</p>
+            <h4 className="text-xl font-extrabold text-slate-900 mt-0.5">{formatVND(totalNetSalary)}</h4>
+            <p className="text-[10px] text-slate-500 mt-0.5">Gốc: {formatVND(totalSalary)} (Ứng: {formatVND(totalAdvance)})</p>
           </div>
         </div>
 
@@ -232,7 +248,9 @@ export default function PayrollReports({
                   <th className="px-6 py-4">Nhân viên</th>
                   <th className="px-6 py-4">Mức lương theo giờ</th>
                   <th className="px-6 py-4 text-center">Tổng số giờ làm việc</th>
-                  <th className="px-6 py-4 text-right">Tổng lương thanh toán</th>
+                  <th className="px-6 py-4 text-right">Lương ca làm</th>
+                  <th className="px-6 py-4 text-right text-rose-600">Đã tạm ứng</th>
+                  <th className="px-6 py-4 text-right">Thực lĩnh</th>
                   <th className="px-6 py-4 text-center print:hidden">Ký nhận</th>
                 </tr>
               </thead>
@@ -251,8 +269,14 @@ export default function PayrollReports({
                         {p.hours} giờ
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right font-bold text-indigo-600 print:text-slate-950">
+                    <td className="px-6 py-4 text-right font-semibold text-slate-700">
                       {formatVND(p.salary)}
+                    </td>
+                    <td className="px-6 py-4 text-right font-semibold text-rose-600">
+                      {p.advance > 0 ? `-${formatVND(p.advance)}` : '0 ₫'}
+                    </td>
+                    <td className="px-6 py-4 text-right font-bold text-indigo-600 print:text-slate-950">
+                      {formatVND(p.netSalary)}
                     </td>
                     <td className="px-6 py-4 text-center print:hidden">
                       <span className="text-xs text-slate-300">Chưa xác nhận</span>
@@ -268,8 +292,10 @@ export default function PayrollReports({
                   <td className="px-6 py-5">TỔNG CỘNG</td>
                   <td className="px-6 py-5"></td>
                   <td className="px-6 py-5 text-center text-lg">{totalHours} giờ</td>
+                  <td className="px-6 py-5 text-right">{formatVND(totalSalary)}</td>
+                  <td className="px-6 py-5 text-right text-rose-600">-{formatVND(totalAdvance)}</td>
                   <td className="px-6 py-5 text-right text-lg text-indigo-600 print:text-slate-950">
-                    {formatVND(totalSalary)}
+                    {formatVND(totalNetSalary)}
                   </td>
                   <td className="px-6 py-5 print:hidden"></td>
                 </tr>

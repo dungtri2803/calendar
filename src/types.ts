@@ -36,3 +36,12 @@ export interface AppNotification {
   type: 'success' | 'error' | 'info' | 'warning';
   message: string;
 }
+
+export interface SalaryAdvance {
+  id: string;
+  employee_id: string;
+  date: string; // YYYY-MM-DD
+  amount: number;
+  notes?: string;
+  created_at?: string;
+}

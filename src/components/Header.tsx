@@ -1,12 +1,13 @@
-import { 
-  Users, 
-  CalendarDays, 
-  CreditCard, 
-  Database, 
-  Shield, 
-  User, 
-  Sparkles, 
-  RefreshCw 
+import {
+  Users,
+  CalendarDays,
+  CreditCard,
+  Database,
+  Shield,
+  User,
+  Sparkles,
+  RefreshCw,
+  Coins
 } from 'lucide-react';
 import { Employee, UserRole, SupabaseConfig } from '../types';
 
@@ -55,58 +56,54 @@ export default function Header({
             <nav className="hidden md:flex items-center gap-1">
               <button
                 onClick={() => setActiveTab('dashboard')}
-                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
-                  activeTab === 'dashboard'
-                    ? 'bg-indigo-50 text-indigo-600'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                }`}
+                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${activeTab === 'dashboard'
+                  ? 'bg-indigo-50 text-indigo-600'
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  }`}
               >
                 Tổng quan
               </button>
               <button
                 onClick={() => setActiveTab('employees')}
-                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
-                  activeTab === 'employees'
-                    ? 'bg-indigo-50 text-indigo-600'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                }`}
+                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${activeTab === 'employees'
+                  ? 'bg-indigo-50 text-indigo-600'
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  }`}
               >
                 <Users className="h-4 w-4" />
                 Nhân viên
               </button>
               <button
                 onClick={() => setActiveTab('schedule')}
-                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
-                  activeTab === 'schedule'
-                    ? 'bg-indigo-50 text-indigo-600'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                }`}
+                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${activeTab === 'schedule'
+                  ? 'bg-indigo-50 text-indigo-600'
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  }`}
               >
                 <CalendarDays className="h-4 w-4" />
                 Lịch làm việc
               </button>
               <button
                 onClick={() => setActiveTab('payroll')}
-                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
-                  activeTab === 'payroll'
-                    ? 'bg-indigo-50 text-indigo-600'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                }`}
+                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${activeTab === 'payroll'
+                  ? 'bg-indigo-50 text-indigo-600'
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  }`}
               >
                 <CreditCard className="h-4 w-4" />
                 Tính lương
               </button>
               <button
-                onClick={() => setActiveTab('connection')}
-                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
-                  activeTab === 'connection'
-                    ? 'bg-indigo-50 text-indigo-600'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                }`}
+                onClick={() => setActiveTab('advances')}
+                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${activeTab === 'advances'
+                  ? 'bg-indigo-50 text-indigo-600'
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  }`}
               >
-                <Database className="h-4 w-4" />
-                Kết nối DB
+                <Coins className="h-4 w-4" />
+                Ứng lương
               </button>
+
             </nav>
           )}
 
@@ -117,11 +114,10 @@ export default function Header({
               onClick={triggerSync}
               disabled={isSyncing}
               title={dbConfig.isEnabled ? 'Đang đồng bộ với Supabase' : 'Chế độ Demo Offline'}
-              className={`hidden sm:inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-all ${
-                dbConfig.isEnabled
-                  ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-                  : 'border-amber-200 bg-amber-50 text-amber-700'
-              }`}
+              className={`hidden sm:inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-all ${dbConfig.isEnabled
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                : 'border-amber-200 bg-amber-50 text-amber-700'
+                }`}
             >
               {dbConfig.isEnabled ? (
                 <>
@@ -144,22 +140,20 @@ export default function Header({
                   setRole('admin');
                   setActiveTab('dashboard');
                 }}
-                className={`flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all ${
-                  role === 'admin'
-                    ? 'bg-white text-slate-950 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-900'
-                }`}
+                className={`flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all ${role === 'admin'
+                  ? 'bg-white text-slate-950 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-900'
+                  }`}
               >
                 <Shield className="h-3 w-3 text-indigo-500" />
                 <span>Admin</span>
               </button>
               <button
                 onClick={() => setRole('employee')}
-                className={`flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all ${
-                  role === 'employee'
-                    ? 'bg-white text-slate-950 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-900'
-                }`}
+                className={`flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all ${role === 'employee'
+                  ? 'bg-white text-slate-950 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-900'
+                  }`}
               >
                 <User className="h-3 w-3 text-indigo-500" />
                 <span>Nhân viên</span>
@@ -191,41 +185,43 @@ export default function Header({
         <div className="md:hidden border-t border-slate-100 bg-white px-4 py-2 flex items-center justify-around gap-1 overflow-x-auto">
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-md whitespace-nowrap ${
-              activeTab === 'dashboard' ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600'
-            }`}
+            className={`px-3 py-1.5 text-xs font-semibold rounded-md whitespace-nowrap ${activeTab === 'dashboard' ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600'
+              }`}
           >
             Tổng quan
           </button>
           <button
             onClick={() => setActiveTab('employees')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-md whitespace-nowrap flex items-center gap-1 ${
-              activeTab === 'employees' ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600'
-            }`}
+            className={`px-3 py-1.5 text-xs font-semibold rounded-md whitespace-nowrap flex items-center gap-1 ${activeTab === 'employees' ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600'
+              }`}
           >
             Nhân viên
           </button>
           <button
             onClick={() => setActiveTab('schedule')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-md whitespace-nowrap flex items-center gap-1 ${
-              activeTab === 'schedule' ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600'
-            }`}
+            className={`px-3 py-1.5 text-xs font-semibold rounded-md whitespace-nowrap flex items-center gap-1 ${activeTab === 'schedule' ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600'
+              }`}
           >
             Lịch
           </button>
           <button
             onClick={() => setActiveTab('payroll')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-md whitespace-nowrap flex items-center gap-1 ${
-              activeTab === 'payroll' ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600'
-            }`}
+            className={`px-3 py-1.5 text-xs font-semibold rounded-md whitespace-nowrap flex items-center gap-1 ${activeTab === 'payroll' ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600'
+              }`}
           >
             Tính lương
           </button>
           <button
+            onClick={() => setActiveTab('advances')}
+            className={`px-3 py-1.5 text-xs font-semibold rounded-md whitespace-nowrap flex items-center gap-1 ${activeTab === 'advances' ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600'
+              }`}
+          >
+            Ứng lương
+          </button>
+          <button
             onClick={() => setActiveTab('connection')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-md whitespace-nowrap flex items-center gap-1 ${
-              activeTab === 'connection' ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600'
-            }`}
+            className={`px-3 py-1.5 text-xs font-semibold rounded-md whitespace-nowrap flex items-center gap-1 ${activeTab === 'connection' ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600'
+              }`}
           >
             DB
           </button>
