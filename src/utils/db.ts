@@ -29,8 +29,12 @@ CREATE TABLE employees (
     name TEXT NOT NULL,
     dob DATE NOT NULL,
     hourly_rate NUMERIC(12, 2) NOT NULL DEFAULT 0,
+    pin_hash TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()) NOT NULL
 );
+
+-- Nếu database đã tồn tại từ phiên bản cũ, chạy thêm dòng này:
+-- ALTER TABLE employees ADD COLUMN IF NOT EXISTS pin_hash TEXT;
 
 -- 2. Bảng cấu hình ca làm việc
 CREATE TABLE shift_types (
@@ -112,6 +116,7 @@ export const db = {
         name: employee.name,
         dob: employee.dob,
         hourly_rate: Number(employee.hourly_rate),
+        pin_hash: employee.pin_hash || null,
       })
       .select()
       .single();

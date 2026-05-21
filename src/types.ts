@@ -3,6 +3,7 @@ export interface Employee {
   name: string;
   dob: string;
   hourly_rate: number;
+  pin_hash?: string;
   created_at?: string;
 }
 

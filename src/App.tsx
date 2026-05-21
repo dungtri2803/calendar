@@ -17,6 +17,7 @@ import SalaryAdvances from './components/SalaryAdvances';
 import SupabaseSettings from './components/SupabaseSettings';
 import UserView from './components/UserView';
 import AdminLoginModal from './components/AdminLoginModal';
+import EmployeeLogin from './components/EmployeeLogin';
 
 export default function App() {
   // Security and Navigation States
@@ -32,8 +33,10 @@ export default function App() {
   const [assignments, setAssignments] = useState<ShiftAssignment[]>([]);
   const [salaryAdvances, setSalaryAdvances] = useState<SalaryAdvance[]>([]);
   
-  // Active logged in simulated employee for user workspace
-  const [activeEmployeeId, setActiveEmployeeId] = useState<string>('');
+  // Active employee session for personal workspace
+  const [activeEmployeeId, setActiveEmployeeId] = useState<string>(() => {
+    return localStorage.getItem('active_employee_id') || '';
+  });
 
   // Database configuration
   const [dbConfig, setDbConfig] = useState<SupabaseConfig>(getSupabaseConfig);
@@ -59,7 +62,8 @@ export default function App() {
     } else {
       setRoleState('employee');
       localStorage.setItem('user_role', 'employee');
-      addNotification('info', 'Đã đăng xuất quyền Admin.');
+      setActiveTab('dashboard');
+      addNotification('info', 'Đã chuyển sang khu vực nhân viên.');
     }
   };
 
@@ -89,11 +93,6 @@ export default function App() {
       setShiftTypes(fetchedShiftTypes);
       setAssignments(fetchedAssignments);
       setSalaryAdvances(fetchedSalaryAdvances);
-
-      // Set default active employee if none selected
-      if (fetchedEmployees.length > 0 && !activeEmployeeId) {
-        setActiveEmployeeId(fetchedEmployees[0].id);
-      }
     } catch (error: any) {
       console.error(error);
       addNotification(
@@ -103,7 +102,7 @@ export default function App() {
     } finally {
       setIsSyncing(false);
     }
-  }, [activeEmployeeId, addNotification]);
+  }, [addNotification]);
 
   // Initial load on mount
   useEffect(() => {
@@ -164,6 +163,7 @@ export default function App() {
       // Clear active selection if it was deleted
       if (activeEmployeeId === id) {
         setActiveEmployeeId('');
+        localStorage.removeItem('active_employee_id');
       }
       await loadAllData();
     } catch (error: any) {
@@ -273,10 +273,35 @@ export default function App() {
       setIsSyncing(false);
     }
   };
+  const loggedInEmployee = employees.find(e => e.id === activeEmployeeId);
+  const employeeAssignments = loggedInEmployee
+    ? assignments.filter((assignment) => assignment.employee_id === loggedInEmployee.id)
+    : [];
+  const employeeSalaryAdvances = loggedInEmployee
+    ? salaryAdvances.filter((advance) => advance.employee_id === loggedInEmployee.id)
+    : [];
 
+  const handleEmployeeLogin = (employeeId: string) => {
+    setActiveEmployeeId(employeeId);
+    localStorage.setItem('active_employee_id', employeeId);
+    const empName = employees.find((emp) => emp.id === employeeId)?.name || 'nhân viên';
+    addNotification('success', `Đã đăng nhập khu vực nhân viên: ${empName}`);
+  };
 
+  const handleEmployeeLogout = () => {
+    setActiveEmployeeId('');
+    localStorage.removeItem('active_employee_id');
+    addNotification('info', 'Đã đăng xuất khu vực nhân viên.');
+  };
 
-  const activeEmployee = employees.find(e => e.id === activeEmployeeId) || employees[0];
+  useEffect(() => {
+    if (!activeEmployeeId || employees.length === 0) return;
+    const employeeExists = employees.some((employee) => employee.id === activeEmployeeId);
+    if (!employeeExists) {
+      setActiveEmployeeId('');
+      localStorage.removeItem('active_employee_id');
+    }
+  }, [activeEmployeeId, employees]);
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-700 antialiased">
@@ -287,7 +312,8 @@ export default function App() {
         setRole={handleRoleChange}
         employees={employees}
         activeEmployeeId={activeEmployeeId}
-        setActiveEmployeeId={setActiveEmployeeId}
+        activeEmployee={loggedInEmployee}
+        onEmployeeLogout={handleEmployeeLogout}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         dbConfig={dbConfig}
@@ -361,19 +387,15 @@ export default function App() {
         ) : (
           /* EMPLOYEE VIEWPORT */
           <div className="animate-fade-in">
-            {activeEmployee ? (
+            {loggedInEmployee ? (
               <UserView
-                employee={activeEmployee}
+                employee={loggedInEmployee}
                 shiftTypes={shiftTypes}
-                assignments={assignments}
-                salaryAdvances={salaryAdvances}
+                assignments={employeeAssignments}
+                salaryAdvances={employeeSalaryAdvances}
               />
             ) : (
-              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white py-16 text-center max-w-md mx-auto mt-12">
-                <AlertCircle className="h-12 w-12 text-amber-500" />
-                <h3 className="mt-4 text-lg font-bold text-slate-900">Chưa có nhân sự nào khả dụng</h3>
-                <p className="mt-1 text-sm text-slate-500">Hãy chuyển lại vai trò Admin và khởi tạo nhân viên trước.</p>
-              </div>
+              <EmployeeLogin employees={employees} onLogin={handleEmployeeLogin} />
             )}
           </div>
         )}

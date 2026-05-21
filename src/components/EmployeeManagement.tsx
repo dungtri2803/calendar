@@ -6,6 +6,7 @@ import {
   Trash2, 
   DollarSign, 
   Calendar, 
+  KeyRound,
   Search, 
   Check, 
   X, 
@@ -18,6 +19,7 @@ import {
   formatVND, 
   filterAssignmentsByMonth 
 } from '../utils/calculations';
+import { hashEmployeePin, isValidPin } from '../utils/auth';
 
 interface EmployeeManagementProps {
   employees: Employee[];
@@ -43,6 +45,7 @@ export default function EmployeeManagement({
   const [name, setName] = useState('');
   const [dob, setDob] = useState('');
   const [hourlyRate, setHourlyRate] = useState(30000);
+  const [pin, setPin] = useState('');
   const [formError, setFormError] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
@@ -69,6 +72,7 @@ export default function EmployeeManagement({
     setName('');
     setDob('');
     setHourlyRate(30000);
+    setPin('');
     setFormError('');
     setIsEditing('new');
   };
@@ -78,6 +82,7 @@ export default function EmployeeManagement({
     setName(emp.name);
     setDob(emp.dob);
     setHourlyRate(emp.hourly_rate);
+    setPin('');
     setFormError('');
     setIsEditing(emp.id);
   };
@@ -100,13 +105,33 @@ export default function EmployeeManagement({
       return;
     }
 
+    const currentEmployee = isEditing && isEditing !== 'new'
+      ? employees.find((emp) => emp.id === isEditing)
+      : undefined;
+
+    if (isEditing === 'new' && !pin) {
+      setFormError('Vui lòng tạo mã PIN đăng nhập cho nhân viên.');
+      return;
+    }
+    if (pin && !isValidPin(pin)) {
+      setFormError('Mã PIN chỉ gồm 4-8 chữ số.');
+      return;
+    }
+    if (currentEmployee && !currentEmployee.pin_hash && !pin) {
+      setFormError('Nhân viên này chưa có mã PIN. Vui lòng tạo mã PIN trước khi lưu.');
+      return;
+    }
+
     setIsSaving(true);
     try {
+      const nextPinHash = pin ? await hashEmployeePin(pin) : currentEmployee?.pin_hash;
+
       if (isEditing === 'new') {
         await onAddEmployee({
           name: name.trim(),
           dob,
           hourly_rate: hourlyRate,
+          pin_hash: nextPinHash,
         });
       } else if (isEditing) {
         await onUpdateEmployee({
@@ -114,6 +139,7 @@ export default function EmployeeManagement({
           name: name.trim(),
           dob,
           hourly_rate: hourlyRate,
+          pin_hash: nextPinHash,
         });
       }
       setIsEditing(null);
@@ -241,6 +267,27 @@ export default function EmployeeManagement({
                 </div>
               </div>
 
+              {/* Employee PIN */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  Mã PIN đăng nhập {isEditing === 'new' ? '' : '(để trống nếu không đổi)'}
+                </label>
+                <div className="relative">
+                  <KeyRound className="absolute top-2.5 left-3 h-4 w-4 text-slate-400 pointer-events-none" />
+                  <input
+                    type="password"
+                    inputMode="numeric"
+                    value={pin}
+                    onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 8))}
+                    placeholder={isEditing === 'new' ? 'Tạo PIN 4-8 số' : 'Nhập PIN mới nếu muốn đổi'}
+                    className="w-full rounded-xl border border-slate-200 pl-9 pr-3 py-2 text-sm font-bold text-slate-800 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+                <p className="text-[11px] font-medium text-slate-400">
+                  PIN được lưu dưới dạng mã hash, dùng để nhân viên tự xem lịch và lương cá nhân.
+                </p>
+              </div>
+
               {/* Footer buttons */}
               <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
                 <button
@@ -285,6 +332,7 @@ export default function EmployeeManagement({
                   <th className="px-6 py-4">Nhân viên</th>
                   <th className="px-6 py-4">Ngày sinh</th>
                   <th className="px-6 py-4">Mức lương / giờ</th>
+                  <th className="px-6 py-4 text-center">PIN</th>
                   <th className="px-6 py-4 text-center">Giờ làm ({selectedMonth})</th>
                   <th className="px-6 py-4 text-right">Thành tiền ({selectedMonth})</th>
                   <th className="px-6 py-4 text-center">Hành động</th>
@@ -319,6 +367,15 @@ export default function EmployeeManagement({
                       </td>
                       <td className="px-6 py-4.5 font-semibold text-slate-800">
                         {formatVND(emp.hourly_rate)} <span className="text-xs font-normal text-slate-400">/h</span>
+                      </td>
+                      <td className="px-6 py-4.5 text-center">
+                        <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-bold ${
+                          emp.pin_hash
+                            ? 'border-emerald-100 bg-emerald-50 text-emerald-700'
+                            : 'border-amber-100 bg-amber-50 text-amber-700'
+                        }`}>
+                          {emp.pin_hash ? 'Đã đặt' : 'Chưa đặt'}
+                        </span>
                       </td>
                       <td className="px-6 py-4.5 text-center">
                         <span className="inline-flex items-center rounded-full bg-indigo-50 border border-indigo-100 px-2.5 py-1 text-xs font-bold text-indigo-700">
